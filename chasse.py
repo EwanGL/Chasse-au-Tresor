@@ -1,6 +1,6 @@
-# Auteur Pascal Vincent
+# Auteur Pascal VINCENT & Ewan GRIGNOUX LEVERT
 # coding: utf-8
-# 
+# Mai 2020
 from PIL import ImageTk  # On importe la bibliothèque PIL
 import sys 
 from tkinter import *
@@ -38,7 +38,7 @@ def chargerImages(liste):
 imagesTresors = chargerImages(listeTresors)
 
 # Les variables
-poids_maxi = 8
+poids_maxi = 10
 poids_sac = 0
 valeur_sac = 0
 
@@ -61,7 +61,6 @@ def dessinerTresors(liste):
         canvas.create_text(60+(numero%4)*140, 140+(numero//4)*150 , fill="yellow", text = f"{tresor['poids']} kg {tresor['valeur']} €" , font = maPolice)
         numero = numero + 1
 
-
 def clickChoisir(event):
     numeroTresor = - 1
     if event.x > 0 :
@@ -77,16 +76,30 @@ def choisirTresor(numero):
     global listeTresors
     global poids_sac
     global valeur_sac
-                
-        # Si le numero n'est pas - 1
-        # Si le tresor est "disponible"
-        # si le poids entre dans le sac
-        # Ajouter son poids et sa valeur au sac
-        # mettre l'état a "pris"
-        
-    print(numero)
+    #print(f"poids_sac{poids_sac}")
+    if numero > -1 and listeTresors[numero]['etat'] == 'disponible':
+        if listeTresors[numero]['poids'] + poids_sac <= poids_maxi:
+            listeTresors[numero]['etat'] = 'pris'
+            poids_sac += listeTresors[numero]['poids']
+            poids_sac = round(poids_sac,1)
+            valeur_sac += listeTresors[numero]['valeur']
+            valeur_sac = round(valeur_sac,1)
+            dessinerTresors(listeTresors)
+            return True
+
+        else:
+            return False
+    else:
+        return False
     
-    
+def init():
+    global poids_sac, valeur_sac, listeTresors
+    poids_sac = 0
+    valeur_sac = 0
+    for tresor in listeTresors:
+        tresor['etat'] = 'disponible'
+    dessinerTresors(listeTresors)
+
 # Réglage des paramètres de la fenêtre
 maFenetre.title("Chasse au trésor")  # Le titre
 maFenetre.geometry('780x610+300+50')  # La position
@@ -100,6 +113,8 @@ sac.grid(row=0,column = 0)
 etiquette_sac = Label(maFenetre, font = maPolice, fg = "yellow", bg="#44815d")
 etiquette_sac.grid(row=1,column = 0)
 
+reinitialisation = Button(maFenetre, text="Réinitialiser", font = maPolice, fg = "yellow", bg="#44815d", command=init)
+reinitialisation.grid(row=2, column=0, padx=5, pady=5)
 
 canvas = Canvas(maFenetre, bg="#44815d", width=560, height=600)
 canvas.grid(row=0, column = 1,rowspan=3)
